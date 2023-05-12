@@ -27,10 +27,12 @@ In this capstone project, you will work with three data files from the Sea Aroun
 -   The third file contains data from the _EEZ_ of a single country (Fiji), which is near the Pacific, Western Central open seas area.
 
 ### Initial Environment
-![[Pasted image 20230502084509.png]]
+![image](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/c6c7c22a-57bf-4527-90f5-8b74a65ffa59)  
+
 
 ### Final Architecture
-![[Pasted image 20230502084522.png]]
+![Pasted image 20230502084522](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/d580ba27-5185-4444-8ae8-8b0a2b38932c)  
+
 
 ### Tasks done
 ### 1. Configuring the development environment
@@ -156,8 +158,9 @@ To run
 fishcrawler => Run crawler => check status => when it changes from running to completed tables will be created
 To verify that table is created
 Databases => fishdb => see tables
-a table for data_source_0001 is created with following schema
-![[Pasted image 20230502095222.png]]
+a table for data_source_0001 is created with following schema  
+![Pasted image 20230502095222](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/9ca8fd82-8998-4280-8658-bb7f114654be)  
+
 - To confirm that the table properly categorized the data, we use Athena to run SQ queries against each column in new table
 - Before running SQL queries in Athena, configure Athena Query editor to output data to query-results bucket
 Athena => Query editor => Settings => Browse S3 => query-results-00001 => save
@@ -166,8 +169,9 @@ Example query:
 ```
 SELECT DISTINCT area_name FROM fishdb.data_source_0001;
 ```
-Output:
-![[Pasted image 20230502104316.png]]
+Output:  
+![Pasted image 20230502104316](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/d388000e-27ad-4007-a48f-6f67c6d61b42)  
+
 **Note:** The example query returns two results. For this column, every row in the dataset contains either the value "Pacific, Western Central" (for rows pulled from _SAU-HighSeas-71-v48-0.parquet_) or a null value (for rows pulled from _SAU-GLOBAL-1-v48-0.parquet_).
 Null values indcates the data from all high seas areas
 - Now that the data table is defined, run queries to confirm that it provides useful results
@@ -180,8 +184,9 @@ GROUP BY year, fishing_entity
 ORDER By year
 ```
 
-Output:
-![[Pasted image 20230502103453.png]]
+Output:  
+![Pasted image 20230502103453](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/d2570206-4383-47b8-bda8-aba784d306b9)  
+
 ```
 Code Explanation
 
@@ -210,8 +215,9 @@ WHERE area_name IS NULL and fishing_entity='Fiji' AND year > 2000
 GROUP BY year, fishing_entity
 ORDER By year
 ```
-Output:
-![[Pasted image 20230502104051.png]]
+Output:  
+![Pasted image 20230502104051](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/d2f9fee9-c238-4626-bb96-b856d5cab209)  
+
 - Create a view based on query
 Create => view from query => name: challenge
 Summary:
@@ -281,8 +287,10 @@ Running crawler first time took 2 min 42 sec, but now during updating it only to
 ```
 SELECT DISTINCT area_name FROM fishdb.data_source_0001;
 ```
-Output:
-![[Pasted image 20230502111008.png]]
+Output:  
+![Pasted image 20230502111008](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/91c34836-c766-487a-8b14-be15e1aa192b)  
+
+
 With the addition of the EEZ file to the dataset, this query now returns three results, including the result for rows where the _area_name_ column doesn't have any data.
 - To find the value in US dollars of all fish caught by Fiji _from the open seas_ since 2001, organized by year, use the following query:
 ```
@@ -292,8 +300,9 @@ WHERE area_name IS NULL AND fishing_entity='Fiji' AND year > 2000
 GROUP BY year, fishing_entity
 ORDER By year
 ```
-Output:
-![[Pasted image 20230502111122.png]]
+Output:  
+![Pasted image 20230502111122](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/34c6c3be-7627-4c5d-b1c8-6fca93d2d59e)  
+
 - To find the value in US dollars of all fish caught by Fiji _from the Fiji EEZ_ since 2001, organized by year, use the following query:
 ```
 SELECT year, fishing_entity AS Country, CAST(CAST(SUM(landed_value) AS DOUBLE) AS DECIMAL(38,2)) AS ValueEEZCatch
@@ -302,8 +311,10 @@ WHERE area_name LIKE '%Fiji%' AND fishing_entity='Fiji' AND year > 2000
 GROUP BY year, fishing_entity
 ORDER By year
 ```
-Output:
-![[Pasted image 20230502111230.png]]
+Output:  
+![Pasted image 20230502111230](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/3fcda663-0d57-448a-9ce4-9e0a8b5b0b8f)
+
+
 - To find the value in US dollars of all fish caught by Fiji _from either the Fiji EEZ or the open seas_ since 2001, organized by year, use the following query:
 ```
 SELECT year, fishing_entity AS Country, CAST(CAST(SUM(landed_value) AS DOUBLE) AS DECIMAL(38,2)) AS ValueEEZAndOpenSeasCatch 
@@ -312,8 +323,10 @@ WHERE (area_name LIKE '%Fiji%' OR area_name IS NULL) AND fishing_entity='Fiji' A
 GROUP BY year, fishing_entity
 ORDER By year
 ```
-Output:
-![[Pasted image 20230502111335.png]]
+Output:  
+![Pasted image 20230502111335](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/98c3c908-91b3-4c4d-8834-d04d45f28025)  
+
+
 **Analysis:** If your data is formatted well and the AWS Glue crawler properly updated the metadata table, then the results that you get from the first two queries in this step should add up to the results that you get from the third query.
 
 For example, if you add the _2001 ValueOpenSeasCatch_ value and the _2001 ValueEEZCatch_ value, the total should equal the _2001 ValueEEZAndOpenSeasCatch_ value. If your results are consistent with this description, then it is a good indication that your solution is working as intended.
@@ -329,8 +342,9 @@ GROUP BY year, area_name, fishing_entity, tonnes
 ORDER BY tonnes DESC
 ```
 Verify by viewing the data in Data panel, under views => preview mackerelscatch view
-Output:
-![[Pasted image 20230502111611.png]]
+Output:  
+![Pasted image 20230502111611](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/b80e6309-cffc-447d-9056-b3e3965bbd89)  
+
 
 Summary:
 Firstly, we used pandas to rename the columns of a dataset to consistent format i-e columns of dataset already stored in bucket, Then converted it to parquet format and uplaoded to s3 bucket. After uploading to s3, we ran crawler again to update the schema of table. Finally using Athena we ran various queries of the table and also created view at last for visualization
@@ -341,8 +355,10 @@ Here we will use QuickSight to create a bar chart from our dataset
 - Create QuickSight Account
 QuickSight console => Signup for QuickSight => Enterprise => Continue
 On Create your QuickSigth Account page => QuickSight Account name: capstone-0001 => Notification email address: your email address => IAM role: use existing role: aws-quicksight-service-role-v0 => Finish => Goto Amazon QuickSight after created
-Output:
-![[Pasted image 20230502113011.png]]
+Output:  
+![Pasted image 20230502113011](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/df0ec75d-d65b-442b-95b3-b8dda104a466)  
+
+
 - Create a new QuickSight dataset
 Navigation pane => Datasets => Choose New dataset => Athena 
 Data source name:  `MackerelsView` , Athena workgroup: primary => validate connection => create data source 
@@ -352,8 +368,9 @@ Fields list => Drag year into empty chart => expand field wells area => verify t
 Adjust chart settings => choose two arrow icons in top right corner of chart to expand it => Double-click the chart title, "Sum of Totalweight by Year and Country." => place cursor in text field that reads Default and enter following as new chart title
 `Tonnes of mackerel caught by year by country in the Fiji EEZ and in the Pacific, Western Central open seas` => save
 On left side of chart choose arrow icon above year => choose format => choose number format that doesn't contain commas or period => choose arrow icon on sheet1 tab and rename the sheet to Fish data
-Output:
-![[Pasted image 20230502114030.png]]
+Output:  
+![Pasted image 20230502114030](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/03a1f485-b569-4eaf-9fdd-9f12e3b82543)  
+
 
 - Reduce the amount of data shown in chart
 Return to Athena query editor and modify view your created so that it only includes data for six fishing entities that caught the highest TotalWeight of mackerel fish in any year betwen 2013 and 2018
@@ -408,8 +425,9 @@ ORDER BY TotalWeight DESC;
 This line orders the final results of the view by the total weight in tonnes in descending order.
 ```
 
-Output
-![[Pasted image 20230502115034.png]]
+Output:  
+![Pasted image 20230502115034](https://github.com/JuJu2181/AWS-Data-Engineering-Capstone-Project/assets/43902648/11d7834d-48f7-4a04-8b4d-3f6da0da9408)  
+
 
 Summary:
 Created quick sight account then added quicksight dataset from Athena view. Then we create bar chart in quicksight for default athena view. We then change the view in athena to reduce amount of data shown in chart and again display the chart in QuickSight. Even at end it shows 0$ spend.
